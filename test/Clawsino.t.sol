@@ -93,7 +93,7 @@ contract ClawsinoTest is Test {
         vault.setClawsino(address(clawsino));
 
         // Seed initial liquidity (10 ETH)
-        vault.seedLiquidity{value: 10 ether}();
+        vault.seedLiquidity{ value: 10 ether }();
 
         // Fund players
         vm.deal(player1, 100 ether);
@@ -109,7 +109,7 @@ contract ClawsinoTest is Test {
 
     function test_PlaceBet() public {
         vm.prank(player1);
-        uint256 betId = clawsino.placeBet{value: 0.1 ether}(FIFTY_PERCENT);
+        uint256 betId = clawsino.placeBet{ value: 0.1 ether }(FIFTY_PERCENT);
 
         assertEq(betId, 1);
 
@@ -123,19 +123,19 @@ contract ClawsinoTest is Test {
     function test_PlaceBet_TooSmall() public {
         vm.prank(player1);
         vm.expectRevert("Bet too small");
-        clawsino.placeBet{value: 0.0001 ether}(FIFTY_PERCENT);
+        clawsino.placeBet{ value: 0.0001 ether }(FIFTY_PERCENT);
     }
 
     function test_PlaceBet_OddsTooLow() public {
         vm.prank(player1);
         vm.expectRevert("Odds too low");
-        clawsino.placeBet{value: 0.1 ether}(0.001e18);
+        clawsino.placeBet{ value: 0.1 ether }(0.001e18);
     }
 
     function test_PlaceBet_OddsTooHigh() public {
         vm.prank(player1);
         vm.expectRevert("Odds too high");
-        clawsino.placeBet{value: 0.1 ether}(0.999e18);
+        clawsino.placeBet{ value: 0.1 ether }(0.999e18);
     }
 
     function test_MaxBet_FiftyPercent() public view {
@@ -154,13 +154,13 @@ contract ClawsinoTest is Test {
     function test_PlaceBet_ExceedsMax() public {
         vm.prank(player1);
         vm.expectRevert("Bet exceeds max");
-        clawsino.placeBet{value: 0.2 ether}(FIFTY_PERCENT);
+        clawsino.placeBet{ value: 0.2 ether }(FIFTY_PERCENT);
     }
 
     function test_Claim_Win() public {
         // Place bet
         vm.prank(player1);
-        uint256 betId = clawsino.placeBet{value: 0.1 ether}(FIFTY_PERCENT);
+        uint256 betId = clawsino.placeBet{ value: 0.1 ether }(FIFTY_PERCENT);
 
         // Mine blocks to get blockhash (need block > betBlock + 1)
         vm.roll(block.number + 2);
@@ -183,7 +183,7 @@ contract ClawsinoTest is Test {
     function test_Claim_Loss() public {
         // Place bet
         vm.prank(player1);
-        uint256 betId = clawsino.placeBet{value: 0.1 ether}(FIFTY_PERCENT);
+        uint256 betId = clawsino.placeBet{ value: 0.1 ether }(FIFTY_PERCENT);
 
         // Mine blocks (need block > betBlock + 1)
         vm.roll(block.number + 2);
@@ -207,7 +207,7 @@ contract ClawsinoTest is Test {
 
     function test_Claim_NotYourBet() public {
         vm.prank(player1);
-        uint256 betId = clawsino.placeBet{value: 0.1 ether}(FIFTY_PERCENT);
+        uint256 betId = clawsino.placeBet{ value: 0.1 ether }(FIFTY_PERCENT);
 
         vm.roll(block.number + 1);
 
@@ -218,7 +218,7 @@ contract ClawsinoTest is Test {
 
     function test_Claim_TooEarly() public {
         vm.prank(player1);
-        uint256 betId = clawsino.placeBet{value: 0.1 ether}(FIFTY_PERCENT);
+        uint256 betId = clawsino.placeBet{ value: 0.1 ether }(FIFTY_PERCENT);
 
         // Don't mine any blocks
         vm.prank(player1);
@@ -229,7 +229,7 @@ contract ClawsinoTest is Test {
     function test_SweepExpired() public {
         // Place bet
         vm.prank(player1);
-        uint256 betId = clawsino.placeBet{value: 0.1 ether}(FIFTY_PERCENT);
+        uint256 betId = clawsino.placeBet{ value: 0.1 ether }(FIFTY_PERCENT);
 
         // Fast forward past expiry (300 blocks)
         vm.roll(block.number + 301);
@@ -345,7 +345,7 @@ contract ClawsinoVaultTest is Test {
 
     function test_Stake() public {
         vm.prank(staker1);
-        uint256 shares = vault.stake{value: 10 ether}();
+        uint256 shares = vault.stake{ value: 10 ether }();
 
         assertEq(shares, 10 ether); // First stake is 1:1
         assertEq(vault.balanceOf(staker1), 10 ether);
@@ -354,10 +354,10 @@ contract ClawsinoVaultTest is Test {
 
     function test_Stake_Multiple() public {
         vm.prank(staker1);
-        vault.stake{value: 10 ether}();
+        vault.stake{ value: 10 ether }();
 
         vm.prank(staker2);
-        uint256 shares = vault.stake{value: 10 ether}();
+        uint256 shares = vault.stake{ value: 10 ether }();
 
         assertEq(shares, 10 ether); // Same share price
         assertEq(vault.balanceOf(staker2), 10 ether);
@@ -366,7 +366,7 @@ contract ClawsinoVaultTest is Test {
 
     function test_Unstake() public {
         vm.prank(staker1);
-        vault.stake{value: 10 ether}();
+        vault.stake{ value: 10 ether }();
 
         uint256 balanceBefore = staker1.balance;
 
@@ -381,12 +381,12 @@ contract ClawsinoVaultTest is Test {
     function test_SharePriceIncrease() public {
         // Staker1 stakes 10 ETH
         vm.prank(staker1);
-        vault.stake{value: 10 ether}();
+        vault.stake{ value: 10 ether }();
 
         // Simulate house win (send 1 ETH to vault from clawsino)
         vm.deal(address(clawsino), 1 ether);
         vm.prank(address(clawsino));
-        (bool success,) = address(vault).call{value: 1 ether}("");
+        (bool success,) = address(vault).call{ value: 1 ether }("");
         assertTrue(success);
 
         // Vault now has 11 ETH, staker1 has 10 shares
@@ -404,7 +404,7 @@ contract ClawsinoVaultTest is Test {
     function test_ReceiveETH_OnlyClawsino() public {
         vm.deal(staker1, 1 ether);
         vm.prank(staker1);
-        (bool success,) = address(vault).call{value: 1 ether}("");
+        (bool success,) = address(vault).call{ value: 1 ether }("");
         assertFalse(success);
     }
 }

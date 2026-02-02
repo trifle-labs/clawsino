@@ -100,7 +100,7 @@ contract Clawsino is IClawsino, ReentrancyGuard, Ownable {
             }
 
             // Transfer winnings to player (original bet + profit from vault)
-            (bool success,) = msg.sender.call{value: payout}("");
+            (bool success,) = msg.sender.call{ value: payout }("");
             require(success, "Transfer failed");
 
             emit BetResolved(betId, true, payout);
@@ -210,7 +210,7 @@ contract Clawsino is IClawsino, ReentrancyGuard, Ownable {
 
     /// @notice Send ETH to vault
     function _sendToVault(uint256 amount) internal {
-        (bool success,) = vault.call{value: amount}("");
+        (bool success,) = vault.call{ value: amount }("");
         require(success, "Vault transfer failed");
     }
 
@@ -241,5 +241,5 @@ contract Clawsino is IClawsino, ReentrancyGuard, Ownable {
     }
 
     /// @notice Receive ETH (for payouts from vault)
-    receive() external payable {}
+    receive() external payable { }
 }

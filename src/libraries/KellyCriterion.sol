@@ -14,11 +14,11 @@ library KellyCriterion {
     /// @param targetOddsE18 Target odds (18 decimals)
     /// @param houseEdgeE18 House edge (18 decimals)
     /// @return maxBet Maximum safe bet amount
-    function calculateMaxBet(
-        uint256 bankroll,
-        uint64 targetOddsE18,
-        uint256 houseEdgeE18
-    ) internal pure returns (uint256 maxBet) {
+    function calculateMaxBet(uint256 bankroll, uint64 targetOddsE18, uint256 houseEdgeE18)
+        internal
+        pure
+        returns (uint256 maxBet)
+    {
         if (bankroll == 0) return 0;
 
         // multiplier = 1 / odds (in E18)
@@ -58,12 +58,11 @@ library KellyCriterion {
     /// @param targetOddsE18 Target odds
     /// @param houseEdgeE18 House edge
     /// @return safe True if bet is within Kelly limit
-    function isBetSafe(
-        uint256 betAmount,
-        uint256 bankroll,
-        uint64 targetOddsE18,
-        uint256 houseEdgeE18
-    ) internal pure returns (bool safe) {
+    function isBetSafe(uint256 betAmount, uint256 bankroll, uint64 targetOddsE18, uint256 houseEdgeE18)
+        internal
+        pure
+        returns (bool safe)
+    {
         uint256 maxBet = calculateMaxBet(bankroll, targetOddsE18, houseEdgeE18);
         safe = betAmount <= maxBet;
     }

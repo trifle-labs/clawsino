@@ -26,9 +26,7 @@ contract ClawsinoVault is ERC4626, Ownable, ReentrancyGuard {
     event Staked(address indexed staker, uint256 assets, uint256 shares);
     event Unstaked(address indexed staker, uint256 shares, uint256 assets);
 
-    constructor(
-        address _weth
-    ) ERC4626(IERC20(_weth)) ERC20("Clawsino Staked ETH", "clawETH") Ownable(msg.sender) {
+    constructor(address _weth) ERC4626(IERC20(_weth)) ERC20("Clawsino Staked ETH", "clawETH") Ownable(msg.sender) {
         weth = IWETH(_weth);
     }
 
@@ -49,7 +47,7 @@ contract ClawsinoVault is ERC4626, Ownable, ReentrancyGuard {
         require(shares > 0, "Zero shares");
 
         // Wrap ETH to WETH
-        weth.deposit{value: msg.value}();
+        weth.deposit{ value: msg.value }();
 
         // Mint shares to sender
         _mint(msg.sender, shares);
@@ -92,7 +90,7 @@ contract ClawsinoVault is ERC4626, Ownable, ReentrancyGuard {
 
         // Unwrap WETH and send ETH
         weth.withdraw(assets);
-        (bool success,) = msg.sender.call{value: assets}("");
+        (bool success,) = msg.sender.call{ value: assets }("");
         require(success, "ETH transfer failed");
 
         emit Unstaked(msg.sender, shares, assets);
@@ -112,7 +110,7 @@ contract ClawsinoVault is ERC4626, Ownable, ReentrancyGuard {
         }
         require(msg.sender == clawsino, "Only Clawsino or WETH");
         // Wrap incoming ETH to WETH
-        weth.deposit{value: msg.value}();
+        weth.deposit{ value: msg.value }();
     }
 
     /// @notice Withdraw ETH to pay Clawsino winners
@@ -122,14 +120,14 @@ contract ClawsinoVault is ERC4626, Ownable, ReentrancyGuard {
         require(weth.balanceOf(address(this)) >= amount, "Insufficient funds");
 
         weth.withdraw(amount);
-        (bool success,) = clawsino.call{value: amount}("");
+        (bool success,) = clawsino.call{ value: amount }("");
         require(success, "Transfer failed");
     }
 
     /// @notice Seed initial liquidity (owner only, for initial setup)
     function seedLiquidity() external payable onlyOwner {
         require(msg.value > 0, "No ETH");
-        weth.deposit{value: msg.value}();
+        weth.deposit{ value: msg.value }();
         // Mint shares to owner
         uint256 shares = msg.value; // 1:1 for initial deposit
         _mint(msg.sender, shares);
@@ -141,7 +139,7 @@ contract ClawsinoVault is ERC4626, Ownable, ReentrancyGuard {
         uint256 balance = weth.balanceOf(address(this));
         if (balance > 0) {
             weth.withdraw(balance);
-            (bool success,) = owner().call{value: balance}("");
+            (bool success,) = owner().call{ value: balance }("");
             require(success, "Transfer failed");
         }
     }

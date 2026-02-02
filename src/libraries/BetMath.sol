@@ -47,11 +47,7 @@ library BetMath {
     /// @param targetOddsE18 Target odds (18 decimals)
     /// @param houseEdgeE18 House edge (18 decimals), e.g., 0.01e18 = 1%
     /// @return won True if the bet won
-    function isWinner(
-        uint256 result,
-        uint64 targetOddsE18,
-        uint256 houseEdgeE18
-    ) internal pure returns (bool won) {
+    function isWinner(uint256 result, uint64 targetOddsE18, uint256 houseEdgeE18) internal pure returns (bool won) {
         // Adjusted odds = targetOdds * (1 - houseEdge)
         uint256 adjustedOddsE18 = (uint256(targetOddsE18) * (E18 - houseEdgeE18)) / E18;
 

@@ -18,7 +18,9 @@ interface IClawsino {
         BetStatus status;
     }
 
-    event BetPlaced(uint256 indexed betId, address indexed player, uint128 amount, uint64 targetOddsE18, uint64 blockNumber);
+    event BetPlaced(
+        uint256 indexed betId, address indexed player, uint128 amount, uint64 targetOddsE18, uint64 blockNumber
+    );
     event BetResolved(uint256 indexed betId, bool won, uint256 payout);
     event BetClaimed(uint256 indexed betId, address indexed player, uint256 payout);
     event BetExpired(uint256 indexed betId);
