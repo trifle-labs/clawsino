@@ -84,7 +84,7 @@ contract Clawsino is IClawsino, ReentrancyGuard, Ownable {
         bytes32 futureBlockHash = blockhash(resultBlock);
         require(futureBlockHash != bytes32(0), "Blockhash unavailable");
 
-        uint256 randomResult = BetMath.computeRandomResult(bet.blockNumber, futureBlockHash);
+        uint256 randomResult = BetMath.computeRandomResult(betId, futureBlockHash);
         bool won = BetMath.isWinner(randomResult, bet.targetOddsE18, houseEdgeE18);
 
         if (won) {
@@ -182,7 +182,7 @@ contract Clawsino is IClawsino, ReentrancyGuard, Ownable {
             return (false, 0);
         }
 
-        uint256 randomResult = BetMath.computeRandomResult(bet.blockNumber, futureBlockHash);
+        uint256 randomResult = BetMath.computeRandomResult(betId, futureBlockHash);
         won = BetMath.isWinner(randomResult, bet.targetOddsE18, houseEdgeE18);
 
         if (won) {

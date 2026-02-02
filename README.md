@@ -21,9 +21,9 @@ Clawsino is a Satoshi Dice-style betting protocol where:
 
 2. **Result**: Determined by block N+1 hash (unknown at bet time)
    - Block N+1 gets mined after the bet
-   - On claim: `random = keccak256(N, blockhash(N+1))`
+   - On claim: `random = keccak256(betId, blockhash(N+1))`
+   - betId acts as nonce ensuring unique results per bet
    - If `random < adjustedOdds` → WIN
-   - Adjusted odds account for 1% house edge
 
 3. **Claim**: Winner calls `claim(betId)` within 256 blocks
    - Payout = betAmount / targetOdds

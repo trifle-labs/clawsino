@@ -34,12 +34,12 @@ library BetMath {
         loss = payout - amount;
     }
 
-    /// @notice Compute random result from blockhash
-    /// @param betBlockNumber The block number when bet was placed
+    /// @notice Compute random result from blockhash and nonce
+    /// @param betId Unique bet identifier (nonce)
     /// @param futureBlockHash The hash of block betBlockNumber + 1
     /// @return result A uniformly distributed uint256
-    function computeRandomResult(uint64 betBlockNumber, bytes32 futureBlockHash) internal pure returns (uint256 result) {
-        result = uint256(keccak256(abi.encodePacked(betBlockNumber, futureBlockHash)));
+    function computeRandomResult(uint256 betId, bytes32 futureBlockHash) internal pure returns (uint256 result) {
+        result = uint256(keccak256(abi.encodePacked(betId, futureBlockHash)));
     }
 
     /// @notice Check if a result is a winner
