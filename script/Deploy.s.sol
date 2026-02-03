@@ -88,24 +88,12 @@ contract Deploy is Script {
 
         // Deploy Vault
         ClawdiceVault vault = new ClawdiceVault(
-            collateralToken,
-            weth,
-            universalRouter,
-            permit2,
-            poolKey,
-            "Clawdice Staked Token",
-            "clawTOKEN"
+            collateralToken, weth, universalRouter, permit2, poolKey, "Clawdice Staked Token", "clawTOKEN"
         );
         console.log("ClawdiceVault deployed at:", address(vault));
 
         // Deploy Clawdice
-        Clawdice clawdice = new Clawdice(
-            address(vault),
-            weth,
-            universalRouter,
-            permit2,
-            poolKey
-        );
+        Clawdice clawdice = new Clawdice(address(vault), weth, universalRouter, permit2, poolKey);
         console.log("Clawdice deployed at:", address(clawdice));
 
         // Link vault to clawdice

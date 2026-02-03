@@ -116,7 +116,14 @@ contract MockPermit2 is IPermit2 {
     // Simplified: just track approvals
     mapping(address => mapping(address => mapping(address => uint160))) public approvals;
 
-    function approve(address token, address spender, uint160 amount, uint48 /* expiration */) external {
+    function approve(
+        address token,
+        address spender,
+        uint160 amount,
+        uint48 /* expiration */
+    )
+        external
+    {
         approvals[msg.sender][token][spender] = amount;
     }
 
@@ -147,7 +154,14 @@ contract MockUniversalRouter is IUniversalRouter {
         rate = _rate;
     }
 
-    function execute(bytes calldata commands, bytes[] calldata inputs, uint256 /* deadline */) external payable {
+    function execute(
+        bytes calldata commands,
+        bytes[] calldata inputs,
+        uint256 /* deadline */
+    )
+        external
+        payable
+    {
         // Simple mock: just look for V4_SWAP command and execute
         if (commands.length > 0 && uint8(commands[0]) == Commands.V4_SWAP) {
             // Decode the V4 swap input
@@ -155,7 +169,8 @@ contract MockUniversalRouter is IUniversalRouter {
 
             // First action should be SWAP_EXACT_IN_SINGLE
             if (actions.length > 0 && uint8(actions[0]) == Actions.SWAP_EXACT_IN_SINGLE) {
-                IV4Router.ExactInputSingleParams memory swapParams = abi.decode(params[0], (IV4Router.ExactInputSingleParams));
+                IV4Router.ExactInputSingleParams memory swapParams =
+                    abi.decode(params[0], (IV4Router.ExactInputSingleParams));
 
                 // In the real Universal Router, it would pull from msg.sender via Permit2.
                 // For testing, we check if msg.sender has the WETH balance and "pull" it.
@@ -227,13 +242,7 @@ contract ClawdiceTest is Test {
         );
 
         // Deploy Clawdice
-        clawdice = new Clawdice(
-            address(vault),
-            address(weth),
-            address(router),
-            address(permit2),
-            poolKey
-        );
+        clawdice = new Clawdice(address(vault), address(weth), address(router), address(permit2), poolKey);
 
         // Set Clawdice in vault
         vault.setClawdice(address(clawdice));
@@ -479,7 +488,8 @@ contract ClawdiceTest is Test {
         uint256 player1BalanceBefore = token.balanceOf(player1);
 
         vm.prank(player1);
-        (uint256 betId2, bool previousWon, uint256 previousPayout) = clawdice.placeBetAndClaimPrevious(50 ether, FIFTY_PERCENT, betId1);
+        (uint256 betId2, bool previousWon, uint256 previousPayout) =
+            clawdice.placeBetAndClaimPrevious(50 ether, FIFTY_PERCENT, betId1);
 
         assertEq(previousWon, won);
         assertEq(betId2, 2);
@@ -515,7 +525,8 @@ contract ClawdiceTest is Test {
 
         // Place second bet and claim first
         vm.prank(player1);
-        (uint256 betId2, bool previousWon, uint256 previousPayout) = clawdice.placeBetAndClaimPrevious(10 ether, 0.1e18, betId1);
+        (uint256 betId2, bool previousWon, uint256 previousPayout) =
+            clawdice.placeBetAndClaimPrevious(10 ether, 0.1e18, betId1);
 
         assertEq(betId2, 2);
 
@@ -695,13 +706,7 @@ contract ClawdiceVaultTest is Test {
             "Clawdice Staked Token",
             "clawTOKEN"
         );
-        clawdice = new Clawdice(
-            address(vault),
-            address(weth),
-            address(router),
-            address(permit2),
-            poolKey
-        );
+        clawdice = new Clawdice(address(vault), address(weth), address(router), address(permit2), poolKey);
         vault.setClawdice(address(clawdice));
 
         // For testing: grant router direct approval on WETH from the contracts

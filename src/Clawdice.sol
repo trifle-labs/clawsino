@@ -49,13 +49,9 @@ contract Clawdice is IClawdice, ReentrancyGuard, Ownable {
 
     event PoolKeyUpdated(PoolKey oldKey, PoolKey newKey);
 
-    constructor(
-        address _vault,
-        address _weth,
-        address _universalRouter,
-        address _permit2,
-        PoolKey memory _poolKey
-    ) Ownable(msg.sender) {
+    constructor(address _vault, address _weth, address _universalRouter, address _permit2, PoolKey memory _poolKey)
+        Ownable(msg.sender)
+    {
         require(_vault != address(0), "Invalid vault");
         vault = _vault;
         collateralToken = IClawdiceVault(_vault).collateralToken();
@@ -297,18 +293,15 @@ contract Clawdice is IClawdice, ReentrancyGuard, Ownable {
         uint256 balanceBefore = collateralToken.balanceOf(address(this));
 
         // Wrap ETH to WETH
-        weth.deposit{value: ethAmount}();
+        weth.deposit{ value: ethAmount }();
 
         // Determine swap direction based on pool key
         // currency0 < currency1 by convention
         bool zeroForOne = Currency.unwrap(poolKey.currency0) == address(weth);
 
         // Encode V4 swap actions
-        bytes memory actions = abi.encodePacked(
-            uint8(Actions.SWAP_EXACT_IN_SINGLE),
-            uint8(Actions.SETTLE_ALL),
-            uint8(Actions.TAKE_ALL)
-        );
+        bytes memory actions =
+            abi.encodePacked(uint8(Actions.SWAP_EXACT_IN_SINGLE), uint8(Actions.SETTLE_ALL), uint8(Actions.TAKE_ALL));
 
         // Encode swap parameters
         bytes[] memory params = new bytes[](3);
@@ -514,5 +507,5 @@ contract Clawdice is IClawdice, ReentrancyGuard, Ownable {
     }
 
     /// @notice Receive ETH (for refunds if swap fails, or direct transfers)
-    receive() external payable {}
+    receive() external payable { }
 }
