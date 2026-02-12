@@ -286,11 +286,11 @@ contract Clawdice is IClawdice, ReentrancyGuard, Ownable {
                 IClawdiceVault(vault).withdrawForPayout(payoutFromVault);
             }
 
-            // Transfer winnings to player
-            collateralToken.safeTransfer(msg.sender, payout);
+            // Transfer winnings to original bettor (not msg.sender - anyone can claim)
+            collateralToken.safeTransfer(bet.player, payout);
 
             emit BetResolved(betId, true, payout);
-            emit BetClaimed(betId, msg.sender, payout);
+            emit BetClaimed(betId, bet.player, payout);
         } else {
             payout = 0;
             bet.status = BetStatus.Lost;
@@ -381,11 +381,11 @@ contract Clawdice is IClawdice, ReentrancyGuard, Ownable {
                 IClawdiceVault(vault).withdrawForPayout(payoutFromVault);
             }
 
-            // Transfer winnings to player
-            collateralToken.safeTransfer(msg.sender, payout);
+            // Transfer winnings to original bettor (not msg.sender - anyone can claim)
+            collateralToken.safeTransfer(bet.player, payout);
 
             emit BetResolved(betId, true, payout);
-            emit BetClaimed(betId, msg.sender, payout);
+            emit BetClaimed(betId, bet.player, payout);
         } else {
             bet.status = BetStatus.Lost;
             _removeFromPending(betId);
