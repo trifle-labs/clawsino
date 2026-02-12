@@ -32,15 +32,8 @@ contract RedeployClawdice is Script {
         vm.startBroadcast(deployerPrivateKey);
 
         // Deploy fresh Vault first
-        ClawdiceVault vault = new ClawdiceVault(
-            CLAW_TOKEN,
-            WETH,
-            UNIVERSAL_ROUTER,
-            PERMIT2,
-            poolKey,
-            "Clawdice Vault",
-            "vCLAW"
-        );
+        ClawdiceVault vault =
+            new ClawdiceVault(CLAW_TOKEN, WETH, UNIVERSAL_ROUTER, PERMIT2, poolKey, "Clawdice Vault", "vCLAW");
         console.log("New Vault deployed at:", address(vault));
 
         // Deploy new Clawdice pointing to fresh vault
