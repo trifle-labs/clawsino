@@ -11,13 +11,13 @@ interface IPoolManager {
 contract InitPoolOnly is Script {
     address constant POOL_MANAGER = 0x05E73354cFDd6745C338b50BcFDfA3Aa6fA03408;
     address constant WETH = 0x4200000000000000000000000000000000000006;
-    
+
     function run() external {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
         address clawToken = vm.envAddress("CLAW_TOKEN");
-        
+
         console.log("Initializing WETH/CLAW pool on Base Sepolia...");
-        
+
         PoolKey memory poolKey = PoolKey({
             currency0: Currency.wrap(WETH),
             currency1: Currency.wrap(clawToken),
@@ -25,10 +25,10 @@ contract InitPoolOnly is Script {
             tickSpacing: 200,
             hooks: address(0)
         });
-        
+
         // sqrt(1) * 2^96 for 1:1 price
         uint160 sqrtPriceX96 = 79228162514264337593543950336;
-        
+
         vm.startBroadcast(deployerPrivateKey);
         int24 tick = IPoolManager(POOL_MANAGER).initialize(poolKey, sqrtPriceX96);
         console.log("Pool initialized at tick:", tick);

@@ -199,12 +199,7 @@ contract Clawdice is IClawdice, ReentrancyGuard, Ownable {
     /// @notice Swap ETH for CLAW tokens via Uniswap V4 (no bet placed)
     /// @param minTokensOut Minimum tokens to receive from swap (slippage protection)
     /// @return tokensReceived Amount of CLAW tokens received
-    function swapETHForClaw(uint256 minTokensOut)
-        external
-        payable
-        nonReentrant
-        returns (uint256 tokensReceived)
-    {
+    function swapETHForClaw(uint256 minTokensOut) external payable nonReentrant returns (uint256 tokensReceived) {
         require(msg.value > 0, "No ETH sent");
 
         // Execute swap via Universal Router
