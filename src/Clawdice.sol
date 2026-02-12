@@ -26,7 +26,6 @@ contract Clawdice is IClawdice, ReentrancyGuard, Ownable {
     using KellyCriterion for *;
     using SafeERC20 for IERC20;
 
-    uint256 public constant MIN_BET = 1e15; // 0.001 tokens (assuming 18 decimals)
     uint256 public constant EXPIRY_BLOCKS = 255; // ~8.5 min on Base (2s blocks), ~51 min on mainnet (12s blocks)
     uint256 public constant BLOCKHASH_LOOKBACK = 256; // EVM limit - blockhash only available for 256 blocks
 
@@ -82,7 +81,7 @@ contract Clawdice is IClawdice, ReentrancyGuard, Ownable {
         // Auto-sweep up to 5 expired bets before processing new bet
         _sweepExpiredInternal(5);
 
-        require(amount >= MIN_BET, "Bet too small");
+        require(amount > 0, "Bet cannot be zero");
         BetMath.validateOdds(targetOddsE18);
 
         uint256 bankroll = _getHouseBalance();
@@ -125,7 +124,7 @@ contract Clawdice is IClawdice, ReentrancyGuard, Ownable {
         // Auto-sweep up to 5 expired bets before processing new bet
         _sweepExpiredInternal(5);
 
-        require(amount >= MIN_BET, "Bet too small");
+        require(amount > 0, "Bet cannot be zero");
         BetMath.validateOdds(targetOddsE18);
 
         uint256 bankroll = _getHouseBalance();
@@ -174,7 +173,7 @@ contract Clawdice is IClawdice, ReentrancyGuard, Ownable {
         // Execute swap via Universal Router
         uint256 tokensReceived = _swapETHForTokens(msg.value, minTokensOut);
 
-        require(tokensReceived >= MIN_BET, "Bet too small");
+        require(tokensReceived > 0, "Swap returned zero");
 
         uint256 bankroll = _getHouseBalance();
         uint256 maxBet = KellyCriterion.calculateMaxBet(bankroll, targetOddsE18, houseEdgeE18);
@@ -236,7 +235,7 @@ contract Clawdice is IClawdice, ReentrancyGuard, Ownable {
         // Then place the new bet (inline to avoid reentrancy issues)
         _sweepExpiredInternal(5);
 
-        require(amount >= MIN_BET, "Bet too small");
+        require(amount > 0, "Bet cannot be zero");
         BetMath.validateOdds(targetOddsE18);
 
         uint256 bankroll = _getHouseBalance();
