@@ -48,6 +48,7 @@ contract Clawdice is IClawdice, ReentrancyGuard, Ownable {
     mapping(uint256 => uint256) public pendingBetIndex; // betId -> index in pendingBetIds + 1 (0 means not in queue)
 
     event PoolKeyUpdated(PoolKey oldKey, PoolKey newKey);
+    event SwapExecuted(address indexed user, uint256 ethIn, uint256 tokensOut);
 
     constructor(address _vault, address _weth, address _universalRouter, address _permit2, PoolKey memory _poolKey)
         Ownable(msg.sender)
@@ -194,6 +195,26 @@ contract Clawdice is IClawdice, ReentrancyGuard, Ownable {
         pendingBetIndex[betId] = pendingBetIds.length; // 1-indexed
 
         emit BetPlaced(betId, msg.sender, uint128(tokensReceived), targetOddsE18, uint64(block.number));
+    }
+
+    /// @notice Swap ETH for CLAW tokens via Uniswap V4 (no bet placed)
+    /// @param minTokensOut Minimum tokens to receive from swap (slippage protection)
+    /// @return tokensReceived Amount of CLAW tokens received
+    function swapETHForClaw(uint256 minTokensOut)
+        external
+        payable
+        nonReentrant
+        returns (uint256 tokensReceived)
+    {
+        require(msg.value > 0, "No ETH sent");
+
+        // Execute swap via Universal Router
+        tokensReceived = _swapETHForTokens(msg.value, minTokensOut);
+
+        // Send tokens to caller
+        collateralToken.safeTransfer(msg.sender, tokensReceived);
+
+        emit SwapExecuted(msg.sender, msg.value, tokensReceived);
     }
 
     /// @notice Place a new bet and claim a previous bet in one transaction

@@ -4,7 +4,7 @@
 set -e
 
 PRIVATE_KEY=${PRIVATE_KEY:?'Set PRIVATE_KEY env var'}
-CLAWDICE="0xe644D8b2f9a4Dd029074AEe183536a5d69410182"
+CLAWDICE="0xd64135C2AeFA49f75421D07d5bb15e8A5DADfC35"
 RPC="https://sepolia.base.org"
 CAST=~/.foundry/bin/cast
 
