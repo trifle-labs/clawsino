@@ -315,10 +315,10 @@ contract ClawdiceTest is Test {
         clawdice.placeBetWithETH{ value: 0.1 ether }(FIFTY_PERCENT, 200 ether);
     }
 
-    function test_PlaceBet_TooSmall() public {
+    function test_PlaceBet_Zero() public {
         vm.prank(player1);
-        vm.expectRevert("Bet too small");
-        clawdice.placeBet(0.0001 ether, FIFTY_PERCENT);
+        vm.expectRevert("Bet cannot be zero");
+        clawdice.placeBet(0, FIFTY_PERCENT);
     }
 
     function test_PlaceBet_OddsTooLow() public {
