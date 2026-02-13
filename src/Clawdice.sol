@@ -249,31 +249,37 @@ contract Clawdice is IClawdice, ReentrancyGuard, Ownable, EIP712 {
     /// @param expiresAt Unix timestamp when session expires (max 7 days from now)
     /// @param maxBetAmount Maximum amount per individual bet
     /// @param signature EIP-712 signature from the player
-    function createSession(address sessionKey, uint256 expiresAt, uint256 maxBetAmount, bytes calldata signature)
-        external
-    {
+    /// @dev Anyone can submit this tx (enables gasless via Paymaster) as long as signature is valid
+    function createSession(
+        address player,
+        address sessionKey,
+        uint256 expiresAt,
+        uint256 maxBetAmount,
+        bytes calldata signature
+    ) external {
+        require(player != address(0), "Invalid player");
         require(sessionKey != address(0), "Invalid session key");
-        require(sessionKey != msg.sender, "Session key cannot be player");
+        require(sessionKey != player, "Session key cannot be player");
         require(expiresAt > block.timestamp, "Already expired");
         require(expiresAt <= block.timestamp + 7 days, "Max 7 day session");
         require(maxBetAmount > 0, "Max bet must be positive");
 
-        // Build EIP-712 struct hash
+        // Build EIP-712 struct hash (uses player's nonce)
         bytes32 structHash = keccak256(
-            abi.encode(SESSION_TYPEHASH, msg.sender, sessionKey, expiresAt, maxBetAmount, sessionNonces[msg.sender]++)
+            abi.encode(SESSION_TYPEHASH, player, sessionKey, expiresAt, maxBetAmount, sessionNonces[player]++)
         );
 
         // Get the full EIP-712 digest
         bytes32 digest = _hashTypedDataV4(structHash);
 
-        // Verify signature - supports both EOA (ECDSA) and Smart Wallets (EIP-1271)
-        require(SignatureChecker.isValidSignatureNow(msg.sender, digest, signature), "Invalid signature");
+        // Verify signature is from the player (supports EOA and Smart Wallets via EIP-1271)
+        require(SignatureChecker.isValidSignatureNow(player, digest, signature), "Invalid signature");
 
-        // Store session (overwrites any existing session for this player)
-        sessions[msg.sender] =
+        // Store session for the player (overwrites any existing session)
+        sessions[player] =
             Session({ sessionKey: sessionKey, expiresAt: expiresAt, maxBetAmount: maxBetAmount, active: true });
 
-        emit SessionCreated(msg.sender, sessionKey, expiresAt, maxBetAmount);
+        emit SessionCreated(player, sessionKey, expiresAt, maxBetAmount);
     }
 
     /// @notice Revoke your active session

@@ -1378,7 +1378,7 @@ contract ClawdiceSessionKeyTest is ClawdiceTestBase {
             _createSessionSignature(player1, player1PrivateKey, sessionKey, expiresAt, maxBetAmount);
 
         vm.prank(player1);
-        clawdice.createSession(sessionKey, expiresAt, maxBetAmount, signature);
+        clawdice.createSession(player1, sessionKey, expiresAt, maxBetAmount, signature);
 
         Clawdice.Session memory session = clawdice.getSession(player1);
         assertEq(session.sessionKey, sessionKey);
@@ -1397,18 +1397,18 @@ contract ClawdiceSessionKeyTest is ClawdiceTestBase {
 
         vm.prank(player1);
         vm.expectRevert("Invalid signature");
-        clawdice.createSession(sessionKey, expiresAt, maxBetAmount, badSignature);
+        clawdice.createSession(player1, sessionKey, expiresAt, maxBetAmount, badSignature);
     }
 
     function test_CreateSession_RejectsSelfAsSessionKey() public {
         uint256 expiresAt = block.timestamp + 1 days;
         uint256 maxBetAmount = 100 ether;
 
+        // Try to use player1 as both player AND sessionKey
         bytes memory signature = _createSessionSignature(player1, player1PrivateKey, player1, expiresAt, maxBetAmount);
 
-        vm.prank(player1);
         vm.expectRevert("Session key cannot be player");
-        clawdice.createSession(player1, expiresAt, maxBetAmount, signature);
+        clawdice.createSession(player1, player1, expiresAt, maxBetAmount, signature);
     }
 
     function test_CreateSession_RejectsExpiredTimestamp() public {
@@ -1420,7 +1420,7 @@ contract ClawdiceSessionKeyTest is ClawdiceTestBase {
 
         vm.prank(player1);
         vm.expectRevert("Already expired");
-        clawdice.createSession(sessionKey, expiresAt, maxBetAmount, signature);
+        clawdice.createSession(player1, sessionKey, expiresAt, maxBetAmount, signature);
     }
 
     function test_CreateSession_RejectsTooLongExpiry() public {
@@ -1432,7 +1432,7 @@ contract ClawdiceSessionKeyTest is ClawdiceTestBase {
 
         vm.prank(player1);
         vm.expectRevert("Max 7 day session");
-        clawdice.createSession(sessionKey, expiresAt, maxBetAmount, signature);
+        clawdice.createSession(player1, sessionKey, expiresAt, maxBetAmount, signature);
     }
 
     function test_CreateSession_NonceIncrementsPreventReplay() public {
@@ -1443,12 +1443,12 @@ contract ClawdiceSessionKeyTest is ClawdiceTestBase {
             _createSessionSignature(player1, player1PrivateKey, sessionKey, expiresAt, maxBetAmount);
 
         vm.prank(player1);
-        clawdice.createSession(sessionKey, expiresAt, maxBetAmount, signature);
+        clawdice.createSession(player1, sessionKey, expiresAt, maxBetAmount, signature);
 
         // Try to replay the same signature - should fail because nonce incremented
         vm.prank(player1);
         vm.expectRevert("Invalid signature");
-        clawdice.createSession(sessionKey, expiresAt, maxBetAmount, signature);
+        clawdice.createSession(player1, sessionKey, expiresAt, maxBetAmount, signature);
     }
 
     // ============ SESSION BET PLACEMENT TESTS ============
@@ -1461,7 +1461,7 @@ contract ClawdiceSessionKeyTest is ClawdiceTestBase {
             _createSessionSignature(player1, player1PrivateKey, sessionKey, expiresAt, maxBetAmount);
 
         vm.prank(player1);
-        clawdice.createSession(sessionKey, expiresAt, maxBetAmount, signature);
+        clawdice.createSession(player1, sessionKey, expiresAt, maxBetAmount, signature);
 
         // Fund player1 and approve
         token.mint(player1, 1000 ether);
@@ -1491,7 +1491,7 @@ contract ClawdiceSessionKeyTest is ClawdiceTestBase {
             _createSessionSignature(player1, player1PrivateKey, sessionKey, expiresAt, maxBetAmount);
 
         vm.prank(player1);
-        clawdice.createSession(sessionKey, expiresAt, maxBetAmount, signature);
+        clawdice.createSession(player1, sessionKey, expiresAt, maxBetAmount, signature);
 
         // Fund player1 and approve
         token.mint(player1, 1000 ether);
@@ -1525,7 +1525,7 @@ contract ClawdiceSessionKeyTest is ClawdiceTestBase {
             _createSessionSignature(player1, player1PrivateKey, sessionKey, expiresAt, maxBetAmount);
 
         vm.prank(player1);
-        clawdice.createSession(sessionKey, expiresAt, maxBetAmount, signature);
+        clawdice.createSession(player1, sessionKey, expiresAt, maxBetAmount, signature);
 
         // Fund player1
         token.mint(player1, 1000 ether);
@@ -1546,7 +1546,7 @@ contract ClawdiceSessionKeyTest is ClawdiceTestBase {
             _createSessionSignature(player1, player1PrivateKey, sessionKey, expiresAt, maxBetAmount);
 
         vm.prank(player1);
-        clawdice.createSession(sessionKey, expiresAt, maxBetAmount, signature);
+        clawdice.createSession(player1, sessionKey, expiresAt, maxBetAmount, signature);
 
         // Session key tries to place bet for player2 (not the player who authorized it)
         vm.prank(sessionKey);
@@ -1562,7 +1562,7 @@ contract ClawdiceSessionKeyTest is ClawdiceTestBase {
             _createSessionSignature(player1, player1PrivateKey, sessionKey, expiresAt, maxBetAmount);
 
         vm.prank(player1);
-        clawdice.createSession(sessionKey, expiresAt, maxBetAmount, signature);
+        clawdice.createSession(player1, sessionKey, expiresAt, maxBetAmount, signature);
 
         // Fund player1
         token.mint(player1, 1000 ether);
@@ -1585,7 +1585,7 @@ contract ClawdiceSessionKeyTest is ClawdiceTestBase {
             _createSessionSignature(player1, player1PrivateKey, sessionKey, expiresAt, maxBetAmount);
 
         vm.prank(player1);
-        clawdice.createSession(sessionKey, expiresAt, maxBetAmount, signature);
+        clawdice.createSession(player1, sessionKey, expiresAt, maxBetAmount, signature);
 
         // Fund player1
         token.mint(player1, 1000 ether);
@@ -1613,7 +1613,7 @@ contract ClawdiceSessionKeyTest is ClawdiceTestBase {
             _createSessionSignature(player1, player1PrivateKey, sessionKey, expiresAt, maxBetAmount);
 
         vm.prank(player1);
-        clawdice.createSession(sessionKey, expiresAt, maxBetAmount, signature);
+        clawdice.createSession(player1, sessionKey, expiresAt, maxBetAmount, signature);
 
         // Revoke session
         vm.prank(player1);
@@ -1637,7 +1637,7 @@ contract ClawdiceSessionKeyTest is ClawdiceTestBase {
             _createSessionSignature(player1, player1PrivateKey, sessionKey, expiresAt, maxBetAmount);
 
         vm.prank(player1);
-        clawdice.createSession(sessionKey, expiresAt, maxBetAmount, signature);
+        clawdice.createSession(player1, sessionKey, expiresAt, maxBetAmount, signature);
 
         // player2 cannot revoke player1's session
         vm.prank(player2);
@@ -1658,7 +1658,7 @@ contract ClawdiceSessionKeyTest is ClawdiceTestBase {
             _createSessionSignature(player1, player1PrivateKey, sessionKey, expiresAt, maxBetAmount);
 
         vm.prank(player1);
-        clawdice.createSession(sessionKey, expiresAt, maxBetAmount, signature);
+        clawdice.createSession(player1, sessionKey, expiresAt, maxBetAmount, signature);
 
         // Now valid
         assertTrue(clawdice.isSessionValid(player1, sessionKey));
