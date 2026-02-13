@@ -64,8 +64,9 @@ contract Clawdice is IClawdice, ReentrancyGuard, Ownable, EIP712 {
     mapping(address => uint256) public sessionNonces; // player -> nonce (prevents replay)
 
     // EIP-712 typehash for session creation
-    bytes32 public constant SESSION_TYPEHASH =
-        keccak256("CreateSession(address player,address sessionKey,uint256 expiresAt,uint256 maxBetAmount,uint256 nonce)");
+    bytes32 public constant SESSION_TYPEHASH = keccak256(
+        "CreateSession(address player,address sessionKey,uint256 expiresAt,uint256 maxBetAmount,uint256 nonce)"
+    );
 
     event PoolKeyUpdated(PoolKey oldKey, PoolKey newKey);
     event SwapExecuted(address indexed user, uint256 ethIn, uint256 tokensOut);
@@ -266,10 +267,7 @@ contract Clawdice is IClawdice, ReentrancyGuard, Ownable, EIP712 {
         bytes32 digest = _hashTypedDataV4(structHash);
 
         // Verify signature - supports both EOA (ECDSA) and Smart Wallets (EIP-1271)
-        require(
-            SignatureChecker.isValidSignatureNow(msg.sender, digest, signature),
-            "Invalid signature"
-        );
+        require(SignatureChecker.isValidSignatureNow(msg.sender, digest, signature), "Invalid signature");
 
         // Store session (overwrites any existing session for this player)
         sessions[msg.sender] =
