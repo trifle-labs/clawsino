@@ -1,0 +1,15 @@
+{
+  "name": "@trifle-labs/clawdice",
+  "version": "1.0.0",
+  "description": "Clawdice smart contracts and deployment addresses",
+  "main": "deployments.json",
+  "exports": {
+    ".": "./deployments.json",
+    "./deployments": "./deployments.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/trifle-labs/clawdice.git"
+  },
+  "license": "MIT"
+}
