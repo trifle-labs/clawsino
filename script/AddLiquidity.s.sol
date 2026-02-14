@@ -30,11 +30,12 @@ contract AddLiquidity is Script {
         console.log("WETH balance:", IERC20(WETH).balanceOf(deployer));
         console.log("CLAW balance:", IERC20(clawToken).balanceOf(deployer));
 
+        // New pool: fee=3000 (0.3%), tickSpacing=60
         PoolKey memory poolKey = PoolKey({
             currency0: Currency.wrap(WETH),
             currency1: Currency.wrap(clawToken),
-            fee: 10000,
-            tickSpacing: 200,
+            fee: 3000,
+            tickSpacing: 60,
             hooks: address(0)
         });
 
@@ -44,11 +45,12 @@ contract AddLiquidity is Script {
         IERC20(WETH).approve(POOL_MODIFY_LIQUIDITY_TEST, type(uint256).max);
         IERC20(clawToken).approve(POOL_MODIFY_LIQUIDITY_TEST, type(uint256).max);
 
-        // Add liquidity - smaller amount
+        // Add liquidity - minimal
         console.log("Adding liquidity...");
+        // Tick range must be multiples of tickSpacing (60)
         IPoolModifyLiquidityTest.ModifyLiquidityParams memory params = IPoolModifyLiquidityTest.ModifyLiquidityParams({
-            tickLower: -887200,
-            tickUpper: 887200,
+            tickLower: -887220, // Near min, multiple of 60
+            tickUpper: 887220,  // Near max, multiple of 60
             liquidityDelta: int256(1e17), // 0.1 liquidity units - minimal
             salt: bytes32(0)
         });
